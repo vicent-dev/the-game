@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"log"
@@ -16,7 +16,7 @@ type Config struct {
 func LoadConfig() *Config {
 	c := &Config{}
 
-	cFile := GetConfigFile()
+	cFile := getConfigFile()
 	err := yaml.Unmarshal(cFile, c)
 
 	if err != nil {

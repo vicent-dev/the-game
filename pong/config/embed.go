@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"embed"
@@ -11,7 +11,7 @@ const (
 	configFileName = "config.yaml"
 )
 
-func GetConfigFile() []byte {
+func getConfigFile() []byte {
 	bs, _ := f.ReadFile(configFileName)
 	return bs
 }

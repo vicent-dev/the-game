@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -10,6 +11,9 @@ import (
 type Game struct{}
 
 func (g *Game) Update() error {
+	cx, cy := ebiten.CursorPosition()
+	sendServer([]byte(strconv.Itoa(cx) + "," + strconv.Itoa(cy)))
+
 	return nil
 }
 

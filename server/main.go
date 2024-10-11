@@ -1,16 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"os"
+
+	"the-game-server/config"
 
 	"github.com/en-vee/alog"
 )
 
 func main() {
 
-	c := LoadConfig()
+	c := config.LoadConfig()
 
 	updAddrStr := c.Server.Host + ":" + c.Server.Port
 
@@ -32,7 +33,7 @@ func main() {
 
 	alog.Info("Waiting for UDP requests [%s]", updAddrStr)
 
-	// Read from UDP listener in endless loop
+	// read - write
 	for {
 		var buf [512]byte
 		_, addr, err := conn.ReadFromUDP(buf[0:])
@@ -41,9 +42,6 @@ func main() {
 			return
 		}
 
-		fmt.Print("> ", string(buf[0:]))
-
-		// Write back the message over UPD
-		conn.WriteToUDP([]byte("Hello UDP Client\n"), addr)
+		conn.WriteToUDP([]byte(string(buf[0:])+"\n"), addr)
 	}
 }
