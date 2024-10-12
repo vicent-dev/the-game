@@ -1,4 +1,4 @@
-package main
+package multiplayer
 
 import (
 	"bufio"
@@ -38,7 +38,7 @@ func connectUdpServer() *net.UDPConn {
 	return conn
 }
 
-func sendServer(info []byte) {
+func SendServer(info []byte) {
 	// Send a message to the server
 	conn := connectUdpServer()
 

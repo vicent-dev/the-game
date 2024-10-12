@@ -4,6 +4,10 @@ github.com/ebitengine/hideconsole v1.0.0 h1:5J4U0kXF+pv/DhiXt5/lTz0eO5ogJ1iXb8Yj
 github.com/ebitengine/hideconsole v1.0.0/go.mod h1:hTTBTvVYWKBuxPr7peweneWdkUwEuHuB3C1R/ielR1A=
 github.com/ebitengine/purego v0.8.0 h1:JbqvnEzRvPpxhCJzJJ2y0RbiZ8nyjccVUrSM3q+GvvE=
 github.com/ebitengine/purego v0.8.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/en-vee/aconf v0.0.0-20190302084711-a3ed365b7cff h1:Q/FSzb34kHK2uLnGkxalw/YutFuY8/d+iSRZnTcJwyU=
+github.com/en-vee/aconf v0.0.0-20190302084711-a3ed365b7cff/go.mod h1:rJ0QnmuXDC2jabOcCX/C6Udf758DRMYT01XCDl0UHJ8=
+github.com/en-vee/alog v0.0.0-20240405223040-168272df9baf h1:xwR0XIyGfrHPtEDRT4PSO/7GW46ynrIKxZnvoexsjis=
+github.com/en-vee/alog v0.0.0-20240405223040-168272df9baf/go.mod h1:eRITUrKt/rznD1RkIgawvk1qYdpHjYK0l8Bq7bQRRvk=
 github.com/hajimehoshi/ebiten/v2 v2.8.1 h1:6n6ZXnbeSCZccdqrH7s9Ut+dll9TEostUqbc72Tis/g=
 github.com/hajimehoshi/ebiten/v2 v2.8.1/go.mod h1:SXx/whkvpfsavGo6lvZykprerakl+8Uo1X8d2U5aAnA=
 github.com/jezek/xgb v1.1.1 h1:bE/r8ZZtSv7l9gk6nU0mYx51aXrvnyb44892TwSaqS4=

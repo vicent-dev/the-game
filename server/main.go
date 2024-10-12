@@ -35,6 +35,7 @@ func main() {
 
 	// read - write
 	for {
+		// fixed size slice to prevent infinite reading of buffer. buf[0:] is a "fake cast" to []byte
 		var buf [512]byte
 		_, addr, err := conn.ReadFromUDP(buf[0:])
 		if err != nil {
