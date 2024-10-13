@@ -6,5 +6,5 @@ import (
 
 var (
 	//go:embed spritesheet.png
-	Spritesheet_png []byte
+	SpriteSheet_png []byte
 )
