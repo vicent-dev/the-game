@@ -22,7 +22,7 @@ func NewPlayer(sprite *ebiten.Image, y float64) *Player {
 		maxvx:  0, // not needed
 		maxvy:  3,
 		acc:    0,
-		width:  0, // not needed
+		width:  7,
 		height: height,
 		scale:  scale,
 	}
@@ -38,6 +38,8 @@ func (p *Player) Update(maxX, maxY float64) {
 	} else if (p.y+p.height*p.scale) <= maxY && ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		p.y += p.vy
 	}
+
+	p.updateHitBox()
 }
 
 func (p *Player) PositionMessage() []byte {

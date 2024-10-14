@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"image"
 	"math"
 	"strconv"
 	"strings"
@@ -22,22 +23,7 @@ type Entity struct {
 	width  float64
 	height float64
 	scale  float64
-}
-
-func NewEntity(sprite *ebiten.Image) *Entity {
-	return &Entity{
-		sprite: sprite,
-		x:      0,
-		y:      0,
-		vx:     2,
-		vy:     2,
-		maxvx:  8,
-		maxvy:  8,
-		acc:    1.0005,
-		width:  7,
-		height: 7,
-		scale:  4,
-	}
+	HitBox image.Rectangle
 }
 
 func (e *Entity) Draw(screen *ebiten.Image) {
@@ -47,6 +33,15 @@ func (e *Entity) Draw(screen *ebiten.Image) {
 	opts.GeoM.Translate(e.x, e.y)
 
 	screen.DrawImage(e.sprite, opts)
+}
+
+func (e *Entity) updateHitBox() {
+	e.HitBox = image.Rect(
+		int(e.x),
+		int(e.y),
+		int(e.x+e.width*e.scale),
+		int(e.y+e.height*e.scale),
+	)
 }
 
 func (e *Entity) processMultiplayerResponse(key string, data string) {

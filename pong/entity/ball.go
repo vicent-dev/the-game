@@ -2,6 +2,7 @@ package entity
 
 import (
 	"fmt"
+	"image"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -31,7 +32,7 @@ func NewBall(sprite *ebiten.Image) *Ball {
 	}
 }
 
-func (b *Ball) Update(maxX, maxY float64) {
+func (b *Ball) Update(maxX, maxY float64, hitBoxes []image.Rectangle) {
 	if (b.x+(b.width*b.scale)) >= maxX || b.x < 0 {
 		b.vx = -b.vx
 	}
@@ -48,8 +49,16 @@ func (b *Ball) Update(maxX, maxY float64) {
 		b.vy *= b.acc
 	}
 
+	for _, hb := range hitBoxes {
+		if hb.Overlaps(b.HitBox) {
+			b.vx = -b.vx
+		}
+	}
+
 	b.x += b.vx
 	b.y += b.vy
+
+	b.updateHitBox()
 }
 
 func (b *Ball) PositionMessage() []byte {

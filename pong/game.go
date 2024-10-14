@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
 	"the-game/asset"
@@ -10,6 +11,7 @@ import (
 	"the-game/multiplayer"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 var (
@@ -45,13 +47,13 @@ func NewGame() *Game {
 func (g *Game) Update() error {
 	w, h := float64(sWidth), float64(sHeight)
 
-	g.ball.Update(w, h)
-
-	go multiplayer.SendServer(g.ball.PositionMessage(), g.ball.ProcessMultiplayerResponse)
-
 	g.player.Update(w, h)
 
 	go multiplayer.SendServer(g.player.PositionMessage(), g.player.ProcessMultiplayerResponse)
+
+	g.ball.Update(w, h, []image.Rectangle{g.player.HitBox})
+
+	go multiplayer.SendServer(g.ball.PositionMessage(), g.ball.ProcessMultiplayerResponse)
 
 	return nil
 }
@@ -63,4 +65,26 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return sWidth, sHeight
+}
+
+func (g *Game) printHitboxes(screen *ebiten.Image) {
+	vector.StrokeRect(screen,
+		float32(g.ball.HitBox.Min.X),
+		float32(g.ball.HitBox.Min.Y),
+		float32(g.ball.HitBox.Dx()),
+		float32(g.ball.HitBox.Dy()),
+		3.0,
+		color.RGBA{255, 0, 0, 255},
+		true,
+	)
+
+	vector.StrokeRect(screen,
+		float32(g.player.HitBox.Min.X),
+		float32(g.player.HitBox.Min.Y),
+		float32(g.player.HitBox.Dx()),
+		float32(g.player.HitBox.Dy()),
+		3.0,
+		color.RGBA{0, 255, 0, 255},
+		true,
+	)
 }
