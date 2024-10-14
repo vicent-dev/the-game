@@ -46,7 +46,7 @@ func SendServer(info []byte) {
 
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return
 	}
 
 	// Read from the connection untill a new line is send
