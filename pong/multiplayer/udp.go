@@ -38,8 +38,7 @@ func connectUdpServer() *net.UDPConn {
 	return conn
 }
 
-func SendServer(info []byte, callback func(data string)) {
-	// Send a message to the server
+func SendServer(info []byte, variationThreshold func(data string)) {
 	conn := connectUdpServer()
 
 	_, err := conn.Write([]byte(string(info) + "\n"))
@@ -49,14 +48,13 @@ func SendServer(info []byte, callback func(data string)) {
 		return
 	}
 
-	// Read from the connection untill a new line is send
+	// read from the connection untill a new line is send
 	data, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Print the data read from the connection to the terminal
-	fmt.Print("> ", string(data))
-	callback(data)
+	// set the entity to server coordinates when variation is bigger than defined threshold
+	variationThreshold(data)
 }
