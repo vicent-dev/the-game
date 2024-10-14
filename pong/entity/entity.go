@@ -49,10 +49,6 @@ func (e *Entity) Draw(screen *ebiten.Image) {
 	screen.DrawImage(e.sprite, opts)
 }
 
-func (e *Entity) GetBounds() (float64, float64) {
-	return e.x, e.y
-}
-
 func (e *Entity) processMultiplayerResponse(key string, data string) {
 	// remove EOL
 	data, _ = strings.CutSuffix(data, "\n")

@@ -36,22 +36,29 @@ func NewGame() *Game {
 
 	g.spriteSheet = ebiten.NewImageFromImage(img)
 
-	g.ball = &entity.Ball{}
-	g.ball.Entity = entity.NewEntity(g.spriteSheet.SubImage(ballRect).(*ebiten.Image))
+	g.ball = entity.NewBall(g.spriteSheet.SubImage(ballRect).(*ebiten.Image))
+	g.player = entity.NewPlayer(g.spriteSheet.SubImage(playerRect).(*ebiten.Image), float64(sHeight)/2)
 
 	return g
 }
 
 func (g *Game) Update() error {
-	g.ball.Move(float64(sWidth), float64(sHeight))
+	w, h := float64(sWidth), float64(sHeight)
+
+	g.ball.Update(w, h)
 
 	go multiplayer.SendServer(g.ball.PositionMessage(), g.ball.ProcessMultiplayerResponse)
+
+	g.player.Update(w, h)
+
+	go multiplayer.SendServer(g.player.PositionMessage(), g.player.ProcessMultiplayerResponse)
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.ball.Draw(screen)
+	g.player.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

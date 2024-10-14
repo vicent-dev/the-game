@@ -6,6 +6,8 @@ import (
 	"net"
 	"os"
 	"the-game/config"
+
+	"github.com/en-vee/alog"
 )
 
 var (
@@ -19,7 +21,7 @@ func connectUdpServer() *net.UDPConn {
 
 	c := config.LoadConfig()
 
-	// Resolve the string address to a UDP address
+	// resolve the string address to a UDP address
 	udpAddr, err := net.ResolveUDPAddr("udp", c.Server.Host+":"+c.Server.Port)
 
 	if err != nil {
@@ -27,7 +29,7 @@ func connectUdpServer() *net.UDPConn {
 		os.Exit(1)
 	}
 
-	// Dial to the address with UDP
+	// dial to the address with UDP
 	conn, err = net.DialUDP("udp", nil, udpAddr)
 
 	if err != nil {
@@ -57,4 +59,5 @@ func SendServer(info []byte, variationThreshold func(data string)) {
 
 	// set the entity to server coordinates when variation is bigger than defined threshold
 	variationThreshold(data)
+	alog.Info(data)
 }

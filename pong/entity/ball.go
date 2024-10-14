@@ -3,13 +3,35 @@ package entity
 import (
 	"fmt"
 	"math"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Ball struct {
 	*Entity
 }
 
-func (b *Ball) Move(maxX, maxY float64) {
+func NewBall(sprite *ebiten.Image) *Ball {
+	e := &Entity{
+		sprite: sprite,
+		x:      0,
+		y:      0,
+		vx:     2,
+		vy:     2,
+		maxvx:  8,
+		maxvy:  8,
+		acc:    1.0005,
+		width:  7,
+		height: 7,
+		scale:  4,
+	}
+
+	return &Ball{
+		Entity: e,
+	}
+}
+
+func (b *Ball) Update(maxX, maxY float64) {
 	if (b.x+(b.width*b.scale)) >= maxX || b.x < 0 {
 		b.vx = -b.vx
 	}
