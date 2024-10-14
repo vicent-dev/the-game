@@ -12,19 +12,22 @@ type Ball struct {
 	*Entity
 }
 
-func NewBall(sprite *ebiten.Image) *Ball {
+func NewBall(sprite *ebiten.Image, x, y float64) *Ball {
+	size := 7.
+	scale := 4.
+
 	e := &Entity{
 		sprite: sprite,
-		x:      0,
-		y:      0,
+		x:      x - size*scale,
+		y:      y - size*scale,
 		vx:     2,
 		vy:     2,
 		maxvx:  8,
 		maxvy:  8,
 		acc:    1.0005,
-		width:  7,
-		height: 7,
-		scale:  4,
+		width:  size,
+		height: size,
+		scale:  scale,
 	}
 
 	return &Ball{
