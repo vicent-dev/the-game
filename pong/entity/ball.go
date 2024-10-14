@@ -33,3 +33,7 @@ func (b *Ball) Move(maxX, maxY float64) {
 func (b *Ball) PositionMessage() []byte {
 	return []byte("ball:" + fmt.Sprintf("%f", b.x) + "," + fmt.Sprintf("%f", b.y))
 }
+
+func (b *Ball) ProcessMultiplayerResponse(data string) {
+	b.Entity.processMultiplayerResponse("ball", data)
+}

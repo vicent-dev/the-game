@@ -1,8 +1,14 @@
 package entity
 
 import (
+	"math"
+	"strconv"
+	"strings"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
+
+const variationThreshold = .00000001
 
 type Entity struct {
 	sprite *ebiten.Image
@@ -45,4 +51,40 @@ func (e *Entity) Draw(screen *ebiten.Image) {
 
 func (e *Entity) GetBounds() (float64, float64) {
 	return e.x, e.y
+}
+
+func (e *Entity) processMultiplayerResponse(key string, data string) {
+	// remove EOL
+	data, _ = strings.CutSuffix(data, "\n")
+	dataSplit := strings.Split(data, ":")
+
+	if len(dataSplit) == 0 {
+		return
+	}
+
+	if dataSplit[0] != key {
+		return
+	}
+
+	serverCoordinates := strings.Split(dataSplit[1], ",")
+
+	ssx := serverCoordinates[0]
+	ssy := serverCoordinates[1]
+
+	sx, err := strconv.ParseFloat(ssx, 64)
+
+	if err != nil {
+		return
+	}
+
+	sy, err := strconv.ParseFloat(ssy, 64)
+
+	if err != nil {
+		return
+	}
+
+	if math.Abs(sx-e.x) >= variationThreshold || math.Abs(sy-e.y) >= variationThreshold {
+		e.x = sx
+		e.y = sy
+	}
 }

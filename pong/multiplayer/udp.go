@@ -38,7 +38,7 @@ func connectUdpServer() *net.UDPConn {
 	return conn
 }
 
-func SendServer(info []byte) {
+func SendServer(info []byte, callback func(data string)) {
 	// Send a message to the server
 	conn := connectUdpServer()
 
@@ -58,4 +58,5 @@ func SendServer(info []byte) {
 
 	// Print the data read from the connection to the terminal
 	fmt.Print("> ", string(data))
+	callback(data)
 }

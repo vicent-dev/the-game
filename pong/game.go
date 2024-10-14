@@ -43,11 +43,9 @@ func NewGame() *Game {
 }
 
 func (g *Game) Update() error {
-	go multiplayer.SendServer(g.ball.PositionMessage())
-
 	g.ball.Move(float64(sWidth), float64(sHeight))
 
-	// @todo ball sync server - client
+	go multiplayer.SendServer(g.ball.PositionMessage(), g.ball.ProcessMultiplayerResponse)
 
 	return nil
 }
