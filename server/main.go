@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"os"
+	"slices"
 
 	"the-game-server/config"
 
@@ -33,16 +35,30 @@ func main() {
 
 	alog.Info("Waiting for UDP requests [%s]", updAddrStr)
 
+	var addrs []*net.UDPAddr
+
+	// @todo change to have multiple matches for a single server instance:w
+	match := &match{}
+
 	// read - write
 	for {
 		// fixed size slice to prevent infinite reading of buffer. buf[0:] is a "fake cast" to []byte
 		var buf [512]byte
 		_, addr, err := conn.ReadFromUDP(buf[0:])
+
 		if err != nil {
 			alog.Error(err.Error())
 			return
 		}
 
-		conn.WriteToUDP([]byte(string(buf[0:])+"\n"), addr)
+		if !slices.Contains(addrs, addr) {
+			addrs = append(addrs, addr)
+			match.joinMatch()
+		}
+
+		fmt.Println("send " + string(buf[0:]))
+		for _, a := range addrs {
+			conn.WriteToUDP([]byte(string(buf[0:])+"\n"), a)
+		}
 	}
 }
