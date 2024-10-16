@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
@@ -80,7 +79,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.ball.Draw(screen)
 	g.player.Draw(screen)
 	g.opponent.Draw(screen)
-	g.printHitboxes(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -95,6 +93,7 @@ func (g *Game) sync() {
 	g.match.UpdatedAt = time.Now()
 
 	g.match.Sync(func(data string) {
+		g.synchronized = false
 		//save into match
 		err := json.Unmarshal([]byte(data), g.match)
 
@@ -106,14 +105,14 @@ func (g *Game) sync() {
 		// sync game from match
 		delay := time.Now().Sub(g.match.UpdatedAt).Seconds()
 
-		fmt.Println("seconds delay ", delay)
 		if delay > 1 {
+			alog.Error("server update not applied. Delay bigger than 1 second ", delay)
 			return
 		}
 
 		g.ball.ProcessMultiplayerCoordinates(g.match.Ball.X, g.match.Ball.Y)
-		// g.player.ProcessMultiplayerCoordinates(g.match.Player.X, g.match.Player.Y)
-		// g.opponent.ProcessMultiplayerCoordinates(g.match.Opponent.X, g.match.Opponent.Y)
+		g.player.ProcessMultiplayerCoordinates(g.match.Player.X, g.match.Player.Y)
+		g.opponent.ProcessMultiplayerCoordinates(g.match.Opponent.X, g.match.Opponent.Y)
 	})
 }
 

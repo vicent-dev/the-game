@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"os"
-	"slices"
 
 	"the-game-server/config"
 
@@ -51,14 +49,25 @@ func main() {
 			return
 		}
 
-		if !slices.Contains(addrs, addr) {
+		if !isAddressAdded(addrs, addr) {
 			addrs = append(addrs, addr)
 			match.joinMatch()
 		}
 
-		fmt.Println("send " + string(buf[0:]))
+		alog.Info("Number addrss ", len(addrs))
+
 		for _, a := range addrs {
-			conn.WriteToUDP([]byte(string(buf[0:])+"\n"), a)
+			go conn.WriteToUDP([]byte(string(buf[0:])+"\n"), a)
 		}
 	}
+}
+
+func isAddressAdded(addrs []*net.UDPAddr, addr *net.UDPAddr) bool {
+	for _, a := range addrs {
+		if a.IP.Equal(addr.IP) && a.Port == addr.Port && a.Zone == addr.Zone {
+			return true
+		}
+	}
+
+	return false
 }
