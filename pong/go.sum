@@ -8,6 +8,8 @@ github.com/en-vee/aconf v0.0.0-20190302084711-a3ed365b7cff h1:Q/FSzb34kHK2uLnGkx
 github.com/en-vee/aconf v0.0.0-20190302084711-a3ed365b7cff/go.mod h1:rJ0QnmuXDC2jabOcCX/C6Udf758DRMYT01XCDl0UHJ8=
 github.com/en-vee/alog v0.0.0-20240405223040-168272df9baf h1:xwR0XIyGfrHPtEDRT4PSO/7GW46ynrIKxZnvoexsjis=
 github.com/en-vee/alog v0.0.0-20240405223040-168272df9baf/go.mod h1:eRITUrKt/rznD1RkIgawvk1qYdpHjYK0l8Bq7bQRRvk=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/hajimehoshi/ebiten/v2 v2.8.1 h1:6n6ZXnbeSCZccdqrH7s9Ut+dll9TEostUqbc72Tis/g=
 github.com/hajimehoshi/ebiten/v2 v2.8.1/go.mod h1:SXx/whkvpfsavGo6lvZykprerakl+8Uo1X8d2U5aAnA=
 github.com/jezek/xgb v1.1.1 h1:bE/r8ZZtSv7l9gk6nU0mYx51aXrvnyb44892TwSaqS4=

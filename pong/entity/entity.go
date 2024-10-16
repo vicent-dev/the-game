@@ -1,17 +1,17 @@
 package entity
 
 import (
+	"fmt"
 	"image"
 	"math"
-	"strconv"
-	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-const variationThreshold = .00000001
+const variationThreshold = 4.0001
 
 type Entity struct {
+	id     string
 	sprite *ebiten.Image
 	x      float64
 	y      float64
@@ -44,38 +44,17 @@ func (e *Entity) updateHitBox() {
 	)
 }
 
-func (e *Entity) processMultiplayerResponse(key string, data string) {
-	// remove EOL
-	data, _ = strings.CutSuffix(data, "\n")
-	dataSplit := strings.Split(data, ":")
+func (e *Entity) possitionMessage(key string) []byte {
+	return []byte(key + "-" + e.id + ":" + fmt.Sprintf("%f", e.x) + "," + fmt.Sprintf("%f", e.y))
+}
 
-	if len(dataSplit) == 0 {
-		return
+func (e *Entity) ProcessMultiplayerCoordinates(x, y float64) {
+	if math.Abs(x-e.x) >= variationThreshold || math.Abs(y-e.y) >= variationThreshold {
+		e.x = x
+		e.y = y
 	}
+}
 
-	if dataSplit[0] != key {
-		return
-	}
-
-	serverCoordinates := strings.Split(dataSplit[1], ",")
-
-	ssx := serverCoordinates[0]
-	ssy := serverCoordinates[1]
-
-	sx, err := strconv.ParseFloat(ssx, 64)
-
-	if err != nil {
-		return
-	}
-
-	sy, err := strconv.ParseFloat(ssy, 64)
-
-	if err != nil {
-		return
-	}
-
-	if math.Abs(sx-e.x) >= variationThreshold || math.Abs(sy-e.y) >= variationThreshold {
-		e.x = sx
-		e.y = sy
-	}
+func (e *Entity) Coordinates() (float64, float64) {
+	return e.x, e.y
 }

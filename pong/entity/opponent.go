@@ -1,22 +1,22 @@
 package entity
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Opponent struct {
+	id string
 	*Entity
 }
 
-func NewOpponent(sprite *ebiten.Image, x, y float64) *Opponent {
+func NewOpponent(id string, sprite *ebiten.Image, x, y float64) *Opponent {
 	height := 32.
 	width := 7.
 
 	scale := 4.
 
 	e := &Entity{
+		id:     id,
 		sprite: sprite,
 		x:      x - 10 - (width * scale),
 		y:      y - (height*scale)/2,
@@ -37,14 +37,4 @@ func NewOpponent(sprite *ebiten.Image, x, y float64) *Opponent {
 
 func (o *Opponent) Update(maxX, maxY float64) {
 	o.updateHitBox()
-}
-
-func (o *Opponent) PositionMessage() []byte {
-	return []byte("opponent:" + fmt.Sprintf("%f", o.x) + "," + fmt.Sprintf("%f", o.y))
-}
-
-func (o *Opponent) ProcessMultiplayerResponse(data string) {
-	o.Entity.processMultiplayerResponse("opponent", data)
-
-	// @todo override default logic and trust server data
 }

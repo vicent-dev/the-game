@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
@@ -9,7 +11,9 @@ import (
 	"the-game/asset"
 	"the-game/entity"
 	"the-game/multiplayer"
+	"time"
 
+	"github.com/en-vee/alog"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
@@ -24,14 +28,18 @@ var (
 )
 
 type Game struct {
-	spriteSheet *ebiten.Image
-	player      *entity.Player
-	opponent    *entity.Opponent
-	ball        *entity.Ball
+	spriteSheet  *ebiten.Image
+	match        *multiplayer.Match
+	player       *entity.Player
+	opponent     *entity.Opponent
+	ball         *entity.Ball
+	synchronized bool
 }
 
 func NewGame() *Game {
-	g := &Game{}
+	g := &Game{
+		synchronized: false,
+	}
 
 	img, _, err := image.Decode(bytes.NewReader(asset.SpriteSheet_png))
 
@@ -39,11 +47,13 @@ func NewGame() *Game {
 		log.Fatal(err.Error())
 	}
 
+	g.match = multiplayer.NewMatch() // @todo make connection process
+
 	g.spriteSheet = ebiten.NewImageFromImage(img)
 
 	g.ball = entity.NewBall(g.spriteSheet.SubImage(ballRect).(*ebiten.Image), float64(sWidth)/2, float64(sHeight)/2)
-	g.player = entity.NewPlayer(g.spriteSheet.SubImage(playerRect).(*ebiten.Image), float64(sHeight)/2)
-	g.opponent = entity.NewOpponent(g.spriteSheet.SubImage(opponentRect).(*ebiten.Image), float64(sWidth), float64(sHeight)/2)
+	g.player = entity.NewPlayer("", g.spriteSheet.SubImage(playerRect).(*ebiten.Image), float64(sHeight)/2)
+	g.opponent = entity.NewOpponent("", g.spriteSheet.SubImage(opponentRect).(*ebiten.Image), float64(sWidth), float64(sHeight)/2)
 
 	return g
 }
@@ -52,19 +62,16 @@ func (g *Game) Update() error {
 	w, h := float64(sWidth), float64(sHeight)
 
 	g.player.Update(w, h)
-
-	go multiplayer.SendServer(g.player.PositionMessage(), g.player.ProcessMultiplayerResponse)
-
 	g.opponent.Update(w, h)
-
-	go multiplayer.SendServer(g.opponent.PositionMessage(), g.opponent.ProcessMultiplayerResponse)
-
 	g.ball.Update(w, h, []image.Rectangle{
 		g.player.HitBox,
 		g.opponent.HitBox,
 	})
 
-	go multiplayer.SendServer(g.ball.PositionMessage(), g.ball.ProcessMultiplayerResponse)
+	if false == g.synchronized && time.Now().Local().Second()%2 == 0 {
+		g.synchronized = true
+		go g.sync()
+	}
 
 	return nil
 }
@@ -73,10 +80,41 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.ball.Draw(screen)
 	g.player.Draw(screen)
 	g.opponent.Draw(screen)
+	g.printHitboxes(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return sWidth, sHeight
+}
+
+func (g *Game) sync() {
+	// first sync our match entity
+	g.match.Player.X, g.match.Player.Y = g.player.Coordinates()
+	g.match.Opponent.X, g.match.Opponent.Y = g.opponent.Coordinates()
+	g.match.Ball.X, g.match.Ball.Y = g.ball.Coordinates()
+	g.match.UpdatedAt = time.Now()
+
+	g.match.Sync(func(data string) {
+		//save into match
+		err := json.Unmarshal([]byte(data), g.match)
+
+		if err != nil {
+			alog.Error(err.Error())
+			return
+		}
+
+		// sync game from match
+		delay := time.Now().Sub(g.match.UpdatedAt).Seconds()
+
+		fmt.Println("seconds delay ", delay)
+		if delay > 1 {
+			return
+		}
+
+		g.ball.ProcessMultiplayerCoordinates(g.match.Ball.X, g.match.Ball.Y)
+		// g.player.ProcessMultiplayerCoordinates(g.match.Player.X, g.match.Player.Y)
+		// g.opponent.ProcessMultiplayerCoordinates(g.match.Opponent.X, g.match.Opponent.Y)
+	})
 }
 
 func (g *Game) printHitboxes(screen *ebiten.Image) {

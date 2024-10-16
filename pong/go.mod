@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/en-vee/alog v0.0.0-20240405223040-168272df9baf
+	github.com/google/uuid v1.6.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.1
 	gopkg.in/yaml.v2 v2.4.0
 )

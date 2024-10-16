@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"fmt"
 	"image"
 	"math"
 
@@ -17,14 +16,15 @@ func NewBall(sprite *ebiten.Image, x, y float64) *Ball {
 	scale := 4.
 
 	e := &Entity{
+		id:     "",
 		sprite: sprite,
 		x:      x - size*scale,
 		y:      y - size*scale,
-		vx:     2,
-		vy:     2,
+		vx:     1,
+		vy:     0,
 		maxvx:  8,
 		maxvy:  8,
-		acc:    1.0005,
+		acc:    1.000000005,
 		width:  size,
 		height: size,
 		scale:  scale,
@@ -62,12 +62,4 @@ func (b *Ball) Update(maxX, maxY float64, hitBoxes []image.Rectangle) {
 	b.y += b.vy
 
 	b.updateHitBox()
-}
-
-func (b *Ball) PositionMessage() []byte {
-	return []byte("ball:" + fmt.Sprintf("%f", b.x) + "," + fmt.Sprintf("%f", b.y))
-}
-
-func (b *Ball) ProcessMultiplayerResponse(data string) {
-	b.Entity.processMultiplayerResponse("ball", data)
 }

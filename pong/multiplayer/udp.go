@@ -40,7 +40,7 @@ func connectUdpServer() *net.UDPConn {
 	return conn
 }
 
-func SendServer(info []byte, variationThreshold func(data string)) {
+func sendServer(info []byte, variationThreshold func(data string)) {
 	conn := connectUdpServer()
 
 	_, err := conn.Write([]byte(string(info) + "\n"))

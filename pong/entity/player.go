@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -10,10 +8,11 @@ type Player struct {
 	*Entity
 }
 
-func NewPlayer(sprite *ebiten.Image, y float64) *Player {
+func NewPlayer(id string,sprite *ebiten.Image, y float64) *Player {
 	height := 32.
 	scale := 4.
 	e := &Entity{
+		id:     id,
 		sprite: sprite,
 		x:      10,
 		y:      y - (height*scale)/2,
@@ -40,12 +39,4 @@ func (p *Player) Update(maxX, maxY float64) {
 	}
 
 	p.updateHitBox()
-}
-
-func (p *Player) PositionMessage() []byte {
-	return []byte("player:" + fmt.Sprintf("%f", p.x) + "," + fmt.Sprintf("%f", p.y))
-}
-
-func (p *Player) ProcessMultiplayerResponse(data string) {
-	p.Entity.processMultiplayerResponse("player", data)
 }
