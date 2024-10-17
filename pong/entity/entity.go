@@ -3,9 +3,11 @@ package entity
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const variationThreshold = 4.0001
@@ -23,7 +25,7 @@ type Entity struct {
 	width  float64
 	height float64
 	scale  float64
-	HitBox image.Rectangle
+	hitBox image.Rectangle
 }
 
 func (e *Entity) Draw(screen *ebiten.Image) {
@@ -36,7 +38,7 @@ func (e *Entity) Draw(screen *ebiten.Image) {
 }
 
 func (e *Entity) updateHitBox() {
-	e.HitBox = image.Rect(
+	e.hitBox = image.Rect(
 		int(e.x),
 		int(e.y),
 		int(e.x+e.width*e.scale),
@@ -57,4 +59,26 @@ func (e *Entity) ProcessMultiplayerCoordinates(x, y float64) {
 
 func (e *Entity) Coordinates() (float64, float64) {
 	return e.x, e.y
+}
+
+func (e *Entity) Collides(entities []*Entity) bool {
+	for _, entity := range entities {
+		if entity.hitBox.Overlaps(e.hitBox) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (e *Entity) PrintHitBox(screen *ebiten.Image) {
+	vector.StrokeRect(screen,
+		float32(e.hitBox.Min.X),
+		float32(e.hitBox.Min.Y),
+		float32(e.hitBox.Dx()),
+		float32(e.hitBox.Dy()),
+		3.0,
+		color.RGBA{255, 0, 0, 255},
+		true,
+	)
 }

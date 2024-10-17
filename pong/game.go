@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"image"
-	"image/color"
 	_ "image/png"
 	"log"
 	"the-game/asset"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/en-vee/alog"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 var (
@@ -62,9 +60,9 @@ func (g *Game) Update() error {
 
 	g.player.Update(w, h)
 	g.opponent.Update(w, h)
-	g.ball.Update(w, h, []image.Rectangle{
-		g.player.HitBox,
-		g.opponent.HitBox,
+	g.ball.Update(w, h, []*entity.Entity{
+		g.player.Entity,
+		g.opponent.Entity,
 	})
 
 	if false == g.synchronized && time.Now().Local().Second()%2 == 0 {
@@ -117,33 +115,7 @@ func (g *Game) sync() {
 }
 
 func (g *Game) printHitboxes(screen *ebiten.Image) {
-	vector.StrokeRect(screen,
-		float32(g.ball.HitBox.Min.X),
-		float32(g.ball.HitBox.Min.Y),
-		float32(g.ball.HitBox.Dx()),
-		float32(g.ball.HitBox.Dy()),
-		3.0,
-		color.RGBA{255, 0, 0, 255},
-		true,
-	)
-
-	vector.StrokeRect(screen,
-		float32(g.player.HitBox.Min.X),
-		float32(g.player.HitBox.Min.Y),
-		float32(g.player.HitBox.Dx()),
-		float32(g.player.HitBox.Dy()),
-		3.0,
-		color.RGBA{0, 255, 0, 255},
-		true,
-	)
-
-	vector.StrokeRect(screen,
-		float32(g.opponent.HitBox.Min.X),
-		float32(g.opponent.HitBox.Min.Y),
-		float32(g.opponent.HitBox.Dx()),
-		float32(g.opponent.HitBox.Dy()),
-		3.0,
-		color.RGBA{0, 0, 255, 255},
-		true,
-	)
+	g.ball.PrintHitBox(screen)
+	g.player.PrintHitBox(screen)
+	g.opponent.PrintHitBox(screen)
 }

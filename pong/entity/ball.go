@@ -1,15 +1,20 @@
 package entity
 
 import (
-	"image"
 	"math"
 
+	"github.com/en-vee/alog"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Ball struct {
 	*Entity
 }
+
+const (
+	initialAcc = 1.000000005
+	initialv   = 2
+)
 
 func NewBall(sprite *ebiten.Image, x, y float64) *Ball {
 	size := 7.
@@ -20,11 +25,11 @@ func NewBall(sprite *ebiten.Image, x, y float64) *Ball {
 		sprite: sprite,
 		x:      x - size*scale,
 		y:      y - size*scale,
-		vx:     2,
-		vy:     2,
+		vx:     initialv,
+		vy:     initialv,
 		maxvx:  8,
 		maxvy:  8,
-		acc:    1.000000005,
+		acc:    initialAcc,
 		width:  size,
 		height: size,
 		scale:  scale,
@@ -35,9 +40,22 @@ func NewBall(sprite *ebiten.Image, x, y float64) *Ball {
 	}
 }
 
-func (b *Ball) Update(maxX, maxY float64, hitBoxes []image.Rectangle) {
+func (b *Ball) Update(maxX, maxY float64, gameEntities []*Entity) {
 	if (b.x+(b.width*b.scale)) >= maxX || b.x < 0 {
-		b.vx = -b.vx
+		//@todo save score in game object
+		b.x = maxX/2 - b.width*b.scale
+		b.y = maxY/2 - b.height*b.scale
+
+		b.acc = initialAcc
+		if b.vx > 0 {
+			b.vx = -initialv
+			alog.Info("Point player")
+		} else {
+			b.vx = initialv
+			alog.Info("Point opponent")
+		}
+
+		b.vy = initialv
 	}
 
 	if (b.y+(b.height*b.scale)) >= maxY || b.y < 0 {
@@ -52,10 +70,8 @@ func (b *Ball) Update(maxX, maxY float64, hitBoxes []image.Rectangle) {
 		b.vy *= b.acc
 	}
 
-	for _, hb := range hitBoxes {
-		if hb.Overlaps(b.HitBox) {
-			b.vx = -b.vx
-		}
+	if b.Collides(gameEntities) {
+		b.vx = -b.vx
 	}
 
 	b.x += b.vx
