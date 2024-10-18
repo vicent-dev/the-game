@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net"
 	"os"
 
@@ -35,29 +36,41 @@ func main() {
 
 	var addrs []*net.UDPAddr
 
-	// @todo change to have multiple matches for a single server instance:w
-	match := &match{}
-
 	// read - write
 	for {
-		// fixed size slice to prevent infinite reading of buffer. buf[0:] is a "fake cast" to []byte
-		var buf [512]byte
-		_, addr, err := conn.ReadFromUDP(buf[0:])
+		buf := make([]byte, 512)
+		rl, addr, err := conn.ReadFromUDP(buf)
 
 		if err != nil {
 			alog.Error(err.Error())
 			return
 		}
 
+		match := newMatch()
+
+		err = json.Unmarshal(buf[:rl], match)
+
+		if err != nil {
+			alog.Error("error unmarshal match ", err.Error())
+		}
+
 		if !isAddressAdded(addrs, addr) {
 			addrs = append(addrs, addr)
 			match.joinMatch()
-		}
 
-		alog.Info("Number addrss ", len(addrs))
+			b, err := json.Marshal(match)
 
-		for _, a := range addrs {
-			go conn.WriteToUDP([]byte(string(buf[0:])+"\n"), a)
+			if err != nil {
+				alog.Error(err.Error())
+			}
+
+			alog.Info("sent ", string(b))
+			go conn.WriteToUDP([]byte(string(b)+"\n"), addr)
+			alog.Info("Number addrss ", len(addrs))
+		} else {
+			for _, a := range addrs {
+				go conn.WriteToUDP([]byte(string(buf)+"\n"), a)
+			}
 		}
 	}
 }

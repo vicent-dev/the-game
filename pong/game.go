@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
 	"the-game/asset"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/en-vee/alog"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 var (
@@ -31,6 +33,7 @@ type Game struct {
 	opponent     *entity.Opponent
 	ball         *entity.Ball
 	synchronized bool
+	font         *text.GoTextFaceSource
 }
 
 func NewGame() *Game {
@@ -38,24 +41,41 @@ func NewGame() *Game {
 		synchronized: false,
 	}
 
+	g.match = multiplayer.NewMatch() // @todo make connection process
+
+	s, err := text.NewGoTextFaceSource(bytes.NewReader(asset.Monospace_ttf))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	g.font = s
+
+	g.loadEntities()
+
+	return g
+}
+
+func (g *Game) loadEntities() {
 	img, _, err := image.Decode(bytes.NewReader(asset.SpriteSheet_png))
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	g.match = multiplayer.NewMatch() // @todo make connection process
-
 	g.spriteSheet = ebiten.NewImageFromImage(img)
 
 	g.ball = entity.NewBall(g.spriteSheet.SubImage(ballRect).(*ebiten.Image), float64(sWidth)/2, float64(sHeight)/2)
 	g.player = entity.NewPlayer("", g.spriteSheet.SubImage(playerRect).(*ebiten.Image), float64(sHeight)/2)
 	g.opponent = entity.NewOpponent("", g.spriteSheet.SubImage(opponentRect).(*ebiten.Image), float64(sWidth), float64(sHeight)/2)
-
-	return g
 }
 
 func (g *Game) Update() error {
+	if !g.match.Ready() {
+		g.match.JoinMatch()
+		return nil
+	}
+
 	w, h := float64(sWidth), float64(sHeight)
 
 	g.player.Update(w, h)
@@ -74,6 +94,20 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+
+	if !g.match.Ready() {
+		op := &text.DrawOptions{}
+		op.GeoM.Translate(10, 20)
+		op.ColorScale.ScaleWithColor(color.White)
+
+		text.Draw(screen, "Looking for a fair opponent...", &text.GoTextFace{
+			Source: g.font,
+			Size:   32,
+		}, op)
+
+		return
+	}
+
 	g.ball.Draw(screen)
 	g.player.Draw(screen)
 	g.opponent.Draw(screen)

@@ -4,7 +4,6 @@ go 1.23.2
 
 require (
 	github.com/en-vee/alog v0.0.0-20240405223040-168272df9baf
-	github.com/google/uuid v1.6.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.1
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -14,7 +13,10 @@ require (
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/purego v0.8.0 // indirect
 	github.com/en-vee/aconf v0.0.0-20190302084711-a3ed365b7cff // indirect
+	github.com/go-text/typesetting v0.2.0 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
+	golang.org/x/image v0.20.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
 )

@@ -10,4 +10,7 @@ var (
 
 	//go:embed collision.wav
 	Collision_wav []byte
+
+	//go:embed Monospace.ttf
+	Monospace_ttf []byte
 )
