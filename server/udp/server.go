@@ -3,52 +3,41 @@ package udp
 import (
 	"encoding/json"
 	"net"
-	"os"
 	"the-game-server/config"
 	"the-game-server/match"
 
 	"github.com/en-vee/alog"
 )
 
-func Serve(c *config.Config) {
+func Serve(c *config.Config) error {
 	updAddrStr := c.Server.Host + ":" + c.Server.Port
 
 	// Resolve the string address to a UDP address
 	udpAddr, err := net.ResolveUDPAddr("udp", updAddrStr)
 
 	if err != nil {
-		alog.Error(err.Error())
-		os.Exit(1)
+		return err
 	}
 
 	// Start listening for UDP packages on the given address
 	conn, err := net.ListenUDP("udp", udpAddr)
 
 	if err != nil {
-		alog.Error(err.Error())
-		os.Exit(1)
+		return err
 	}
 
 	alog.Info("Waiting for UDP requests [%s]", updAddrStr)
 
 	var addrs []*net.UDPAddr
+	m := match.NewMatch()
 
 	// read - write
 	for {
 		buf := make([]byte, 512)
-		rl, addr, err := conn.ReadFromUDP(buf)
+		_, addr, err := conn.ReadFromUDP(buf)
 
 		if err != nil {
-			alog.Error(err.Error())
-			return
-		}
-
-		m := match.NewMatch()
-
-		err = json.Unmarshal(buf[:rl], m)
-
-		if err != nil {
-			alog.Error("error unmarshal match ", err.Error())
+			return err
 		}
 
 		if !isAddressAdded(addrs, addr) {
@@ -62,12 +51,22 @@ func Serve(c *config.Config) {
 			}
 
 			alog.Info("send ", string(b))
-			go conn.WriteToUDP([]byte(string(b)+"\n"), addr)
-		} else {
-			for _, a := range addrs {
-				go conn.WriteToUDP([]byte(string(buf)+"\n"), a)
+
+			// when opponent and player are ready we cast to all the match data
+			if m.Opponent.Id != "" && m.Player.Id != "" {
+				broadcastAll(conn, addrs, b)
+			} else {
+				go conn.WriteToUDP([]byte(string(b)+"\n"), addr)
 			}
+		} else {
+			broadcastAll(conn, addrs, buf)
 		}
+	}
+}
+
+func broadcastAll(conn *net.UDPConn, addrs []*net.UDPAddr, b []byte) {
+	for _, a := range addrs {
+		go conn.WriteToUDP([]byte(string(b)+"\n"), a)
 	}
 }
 

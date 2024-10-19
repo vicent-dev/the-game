@@ -24,6 +24,7 @@ type Match struct {
 	Opponent  *playerMatch
 	Ball      *ballMatch
 	UpdatedAt time.Time
+	Seed      string
 }
 
 func NewMatch() *Match {

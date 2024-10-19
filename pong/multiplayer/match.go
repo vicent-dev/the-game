@@ -26,7 +26,7 @@ type Match struct {
 	Opponent            *PlayerMatch
 	Ball                *BallMatch
 	UpdatedAt           time.Time
-	currentUserOpponent bool
+	CurrentUserOpponent bool
 }
 
 func NewMatch() *Match {
@@ -34,12 +34,11 @@ func NewMatch() *Match {
 		Player:              &PlayerMatch{},
 		Opponent:            &PlayerMatch{},
 		Ball:                &BallMatch{},
-		currentUserOpponent: false,
+		CurrentUserOpponent: false,
 	}
 }
 
 func (m *Match) JoinMatch() {
-	alog.Info("connecting to match")
 	m.connectMatch()
 }
 
@@ -49,15 +48,20 @@ func (m *Match) Ready() bool {
 
 func (m *Match) Sync(gameSync func(data string)) {
 	// if users is currently playing as opponent we swap entities
-	if m.currentUserOpponent {
+	if m.CurrentUserOpponent {
+		fmt.Println("current user opponent a true")
 		player := m.Player
 		opponent := m.Opponent
 
 		m.Opponent = player
 		m.Player = opponent
+	} else {
+
+		fmt.Println("current user opponent a falseeee")
 	}
 
 	matchJson, err := json.Marshal(m)
+	alog.Info("send to sync ", string(matchJson))
 
 	if err != nil {
 		alog.Error(err.Error())
@@ -67,18 +71,31 @@ func (m *Match) Sync(gameSync func(data string)) {
 	sendServer(matchJson, gameSync)
 }
 
-func (match *Match) connectMatch() {
-	conn := connectUdpServer()
-	matchJson, err := json.Marshal(match)
+func (m *Match) CopyFromServer(sm *Match) {
+	m.Player.Score = sm.Player.Score
+	m.Player.X = sm.Player.X
+	m.Player.Y = sm.Player.Y
 
-	playerIdIsAlreadyAssigned := match.Player.Id != ""
+	m.Opponent.Score = sm.Opponent.Score
+	m.Opponent.X = sm.Opponent.X
+	m.Opponent.Y = sm.Opponent.Y
+
+	m.Ball.X = sm.Ball.X
+	m.Ball.Y = sm.Ball.Y
+}
+
+func (m *Match) connectMatch() {
+	conn := connectUdpServer()
+
+	playerIdIsAlreadyAssigned := m.Player.Id != ""
+	matchJson, err := json.Marshal(m)
 
 	if err != nil {
 		alog.Error(err.Error())
 		return
 	}
 
-	_, err = conn.Write([]byte(string(matchJson)))
+	_, err = conn.Write([]byte(string(matchJson) + "\n"))
 
 	if err != nil {
 		fmt.Println(err)
@@ -91,11 +108,10 @@ func (match *Match) connectMatch() {
 		return
 	}
 
-	err = json.Unmarshal([]byte(data), match)
-	alog.Debug(match.Player.Id, match.Opponent.Id)
+	err = json.Unmarshal([]byte(data), m)
 
-	if playerIdIsAlreadyAssigned && match.Player.Id != "" && match.Opponent.Id != "" {
-		match.currentUserOpponent = true
+	if playerIdIsAlreadyAssigned && m.Player.Id != "" && m.Opponent.Id != "" {
+		m.CurrentUserOpponent = true
 	}
 
 	if err != nil {

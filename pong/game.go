@@ -126,8 +126,12 @@ func (g *Game) sync() {
 
 	g.match.Sync(func(data string) {
 		g.synchronized = false
-		//save into match
-		err := json.Unmarshal([]byte(data), g.match)
+
+		m := multiplayer.NewMatch()
+
+		err := json.Unmarshal([]byte(data), m)
+
+		g.match.CopyFromServer(m)
 
 		if err != nil {
 			alog.Error(err.Error())
@@ -142,9 +146,17 @@ func (g *Game) sync() {
 			return
 		}
 
+		player := g.match.Player
+		opponent := g.match.Opponent
+
+		if g.match.CurrentUserOpponent {
+			player = g.match.Opponent
+			opponent = g.match.Player
+		}
+
 		g.ball.ProcessMultiplayerCoordinates(g.match.Ball.X, g.match.Ball.Y)
-		g.player.ProcessMultiplayerCoordinates(g.match.Player.X, g.match.Player.Y)
-		g.opponent.ProcessMultiplayerCoordinates(g.match.Opponent.X, g.match.Opponent.Y)
+		g.player.ProcessMultiplayerCoordinates(player.X, player.Y)
+		g.opponent.ProcessMultiplayerCoordinates(opponent.X, opponent.Y)
 	})
 }
 

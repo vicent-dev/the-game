@@ -6,8 +6,6 @@ import (
 	"net"
 	"os"
 	"the-game/config"
-
-	"github.com/en-vee/alog"
 )
 
 var (
@@ -59,5 +57,4 @@ func sendServer(info []byte, variationThreshold func(data string)) {
 
 	// set the entity to server coordinates when variation is bigger than defined threshold
 	variationThreshold(data)
-	alog.Info(data)
 }
