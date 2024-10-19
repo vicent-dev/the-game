@@ -27,18 +27,18 @@ var (
 )
 
 type Game struct {
-	spriteSheet  *ebiten.Image
-	match        *multiplayer.Match
-	player       *entity.Player
-	opponent     *entity.Opponent
-	ball         *entity.Ball
-	synchronized bool
-	font         *text.GoTextFaceSource
+	spriteSheet          *ebiten.Image
+	match                *multiplayer.Match
+	player               *entity.Player
+	opponent             *entity.Opponent
+	ball                 *entity.Ball
+	lastTimeSynchronized *time.Time
+	font                 *text.GoTextFaceSource
 }
 
 func NewGame() *Game {
 	g := &Game{
-		synchronized: false,
+		lastTimeSynchronized: nil,
 	}
 
 	g.match = multiplayer.NewMatch() // @todo make connection process
@@ -85,8 +85,10 @@ func (g *Game) Update() error {
 		g.opponent.Entity,
 	})
 
-	if false == g.synchronized && time.Now().Local().Second()%2 == 0 {
-		g.synchronized = true
+	now := time.Now().Local()
+
+	if g.lastTimeSynchronized == nil || g.lastTimeSynchronized.Second() != now.Second() {
+		g.lastTimeSynchronized = &now
 		go g.sync()
 	}
 
@@ -125,8 +127,6 @@ func (g *Game) sync() {
 	g.match.UpdatedAt = time.Now()
 
 	g.match.Sync(func(data string) {
-		g.synchronized = false
-
 		m := multiplayer.NewMatch()
 
 		err := json.Unmarshal([]byte(data), m)

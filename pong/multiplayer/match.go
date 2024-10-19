@@ -47,17 +47,12 @@ func (m *Match) Ready() bool {
 }
 
 func (m *Match) Sync(gameSync func(data string)) {
-	// if users is currently playing as opponent we swap entities
 	if m.CurrentUserOpponent {
-		fmt.Println("current user opponent a true")
 		player := m.Player
 		opponent := m.Opponent
 
 		m.Opponent = player
 		m.Player = opponent
-	} else {
-
-		fmt.Println("current user opponent a falseeee")
 	}
 
 	matchJson, err := json.Marshal(m)
