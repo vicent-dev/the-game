@@ -1,4 +1,4 @@
-package main
+package match
 
 import (
 	"time"
@@ -19,22 +19,22 @@ type ballMatch struct {
 	Y float64 `json:"y"`
 }
 
-type match struct {
+type Match struct {
 	Player    *playerMatch
 	Opponent  *playerMatch
 	Ball      *ballMatch
 	UpdatedAt time.Time
 }
 
-func newMatch() *match {
-	return &match{
+func NewMatch() *Match {
+	return &Match{
 		Player:   &playerMatch{},
 		Opponent: &playerMatch{},
 		Ball:     &ballMatch{},
 	}
 }
 
-func (m *match) joinMatch() string {
+func (m *Match) JoinMatch() string {
 	playerId := uuid.New().String()
 
 	if m.Player.Id == "" {
